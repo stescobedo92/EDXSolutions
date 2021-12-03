@@ -1,0 +1,197 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+    var listPersons = ViewData["ListPersons"] as List<EDXSolutions.Models.Response.PersonResponse>;
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+                Add Person
+            </button>
+        </div>        
+    </div>
+    <br />
+
+    <div class="row">
+        <div class="col">
+            <table class="table table-striped table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Apellido Paterno</th>
+                        <th>Apellido Materno</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var index in listPersons)
+                    {
+                        <tr>
+                            <td>@index.Nombre</td>
+                            <td>@index.ApPaterno</td>
+                            <td>@index.ApMaterno</td>
+                            <td>
+                                <button type="button" id="btnDelete_@index.Id" name="btnDelete_@index.Id" class="btn btn-danger" value="@index.Id" onclick="deletePeople(@index.Id)">Delete</button>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModalUpdate" onclick="getPeopleById(@index.Id)">
+                                    Update
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- The Modal -->
+<div class="modal" id="myModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Add new person</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="txtForName">Nombre</label>
+                        <input type="text" class="form-control" id="txtName" name="txtName" placeholder="Enter name">
+                    </div>
+                    <div class="form-group">
+                        <label for="txtForName">ApPaterno</label>
+                        <input type="text" class="form-control" id="txtApPaterno" name="txtApPaterno" placeholder="Enter ApPaterno">
+                    </div>
+                    <div class="form-group">
+                        <label for="txtForName">ApMaterno</label>
+                        <input type="text" class="form-control" id="txtApMaterno" name="txtApMaterno" placeholder="Enter ApMaterno">
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="insertPeople()">Add</button>
+                </form>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="myModalUpdate">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Update person</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="txtForName">Nombre</label>
+                        <input type="text" class="form-control" id="txtNameUp" name="txtNameUp" placeholder="Enter name">
+                    </div>
+                    <div class="form-group">
+                        <label for="txtForName">ApPaterno</label>
+                        <input type="text" class="form-control" id="txtApPaternoUp" name="txtApPaternoUp" placeholder="Enter ApPaterno">
+                    </div>
+                    <div class="form-group">
+                        <label for="txtForName">ApMaterno</label>
+                        <input type="text" class="form-control" id="txtApMaternoUp" name="txtApMaternoUp" placeholder="Enter ApMaterno">
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="updPeople()">Update</button>
+                </form>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    function deletePeople(idPerson) {
+        let dataToDelete = { id: idPerson };
+         $.ajax({
+             url: '@Url.Action("Delete", "Home")',
+             type: "post",
+             contentType: 'application/x-www-form-urlencoded',
+             data: dataToDelete,
+             success: function (result) {
+                 window.location.reload(true);
+             }
+         });
+    }
+
+    function insertPeople() {
+        let name = document.getElementById("txtName").value;
+        let apPaterno = document.getElementById("txtApPaterno").value;
+        let apMaterno = document.getElementById("txtApMaterno").value;
+
+        let dataToInsert = { Nombre: name, ApPaterno: apPaterno, ApMaterno: apMaterno };
+         $.ajax({
+             url: '@Url.Action("Insert", "Home")',
+             type: "post",
+             contentType: 'application/x-www-form-urlencoded',
+             data: dataToInsert,
+             success: function (result) {
+                 window.location.reload(true);
+             }
+         });
+    }
+
+    function getPeopleById(idPerson) {
+
+        let dataToInsert = { id: idPerson };
+         $.ajax({
+             url: '@Url.Action("GetPeopleById", "Home")',
+             type: "get",
+             contentType: 'application/x-www-form-urlencoded',
+             data: dataToInsert,
+             success: function (result) {
+                 document.getElementById("txtNameUp").value = result.nombre;
+                 document.getElementById("txtApPaternoUp").value = result.apPaterno;
+                 document.getElementById("txtApMaternoUp").value = result.apMaterno;
+
+                 $("#myModalUpdate").modal()
+                 //window.location.reload(true);
+             }
+         });
+    }
+
+    function updPeople() {
+        let name = document.getElementById("txtNameUp").value;
+        let apPaterno = document.getElementById("txtApPaternoUp").value;
+        let apMaterno = document.getElementById("txtApMaternoUp").value;
+
+        let dataToInsert = { Nombre: name, ApPaterno: apPaterno, ApMaterno: apMaterno };
+         $.ajax({
+             url: '@Url.Action("Update", "Home")',
+             type: "post",
+             contentType: 'application/x-www-form-urlencoded',
+             data: dataToInsert,
+             success: function (result) {
+                 window.location.reload(true);
+             }
+         });
+    }
+
+
+</script>
+
+

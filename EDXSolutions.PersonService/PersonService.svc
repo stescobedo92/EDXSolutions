@@ -1,0 +1,1 @@
+﻿<%@ ServiceHost Language="C#" Debug="true" Service="EDXSolutions.PersonService.Service1" CodeBehind="PersonService.svc.cs" %>
